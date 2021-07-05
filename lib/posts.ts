@@ -21,7 +21,7 @@ export function getSortedPostsData() {
     // データをidと合わせる
     return {
       id,
-      ...matterResult.data
+      ...(matterResult.data as { date: string; title: string })
     }
   })
 
@@ -37,9 +37,17 @@ export function getSortedPostsData() {
 
 export function getAllPostIds() {
   const fileNames = fs.readdirSync(postsDirectory)
+  return fileNames.map(fileName => {
+    return {
+      params: {
+        id: fileName.replace(/\.md$/, '')
+      }
+    }
+  })
+}
   
   /*
-    以下のような配列を返します
+    以下のような配列を返す
     [
       {
         params: {
@@ -54,16 +62,7 @@ export function getAllPostIds() {
     ]
   */
 
-  return fileNames.map(fileName => {
-    return {
-      params: {
-        id: fileName.replace(/\.md$/, '')
-      }
-    }
-  })
-}
-
-export async function getPostData(id) {
+export async function getPostData(id: string) {
   const fullPath = path.join(postsDirectory, `${id}.md`)
   const fileContents = fs.readFileSync(fullPath, 'utf8')
 
@@ -80,6 +79,6 @@ export async function getPostData(id) {
   return {
     id,
     contentHtml,
-    ...matterResult.data
+    ...(matterResult.data as { date: string; title: string})
   }
 }
